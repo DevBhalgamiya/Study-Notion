@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const mailSender = require('../utils/mailSender');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 
 // resetPasswordToken
 
@@ -15,21 +16,22 @@ exports.resetPasswordToken = async (req, res) => {
         if(!user){
             return res.status(401).json({
                 success: false,
-                message: 'Your Email is not registered with us'
+                message: `This Email: ${email} is not Registered With Us Enter a Valid Email `
             });
         }
 
         // generate token
-        const token = crypto.randomUUID();
+        const token = crypto.randomBytes(20).toString("hex");
 
         // update user by adding token and expiration time
         const updatedDetails =  await User.findByIdAndUpdate({email: email}, {
             token: token,
-            resetPasswordExpires: Date.now() + 5*60*1000,
+            resetPasswordExpires: Date.now() + 3600000,
         }, {new: true}); 
 
+        console.log("DETAILS", updatedDetails);
         // create url
-        const url = `http://localhost:3000/update-password/${token}`
+        const url = `http://localhost:3000/update-password/${token}`;
 
         // send mail containing the url
         await mailSender(email, "Password Reset Link", `Password Reset Link: ${url}`);
@@ -61,7 +63,7 @@ exports.resetPassword = async (req, res) => {
         if (password !== confirmpassword) {
             return res.json({
                 success: false,
-                message: 'Password not matching',
+                message: "Password and Confirm Password Does not Match",
             });
         }
 
@@ -77,7 +79,7 @@ exports.resetPassword = async (req, res) => {
         }
 
         // toke time check
-        if (userDetails.resetPasswordExpires < Date.now()) {
+        if (!(userDetails.resetPasswordExpires > Date.now())) {
             return res.json({
                 success: false,
                 message: 'Token is expired, please regenerate your token',
@@ -97,7 +99,7 @@ exports.resetPassword = async (req, res) => {
         // return response
         return res.status(200).json({
             success: true,
-            message: 'Password reset successfull',
+            message: 'Password reset successfully',
         })
     }
     catch(error){

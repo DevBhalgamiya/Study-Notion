@@ -1,67 +1,57 @@
 const User = require("../models/User");
 const OTP = require("../models/OTP");
 const otpGenerator = require('otp-generator');
+const mailSender = require("../utils/mailSender");
+const { passwordUpdated } = require("../mail/templates/passwordUpdate");
+const Profile = require("../models/Profile");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 // sendOTP controller
-exports.sendOTP = async(req, res) => {
-
-    try{
-        // fetch email from request ki body
-        const {email} = req.body;
-
-        // check if user already exist
-        const checkUserPresent = await User.findOne({email});
-
-        // if user already exist then return a response
-        if(checkUserPresent) {
-            return res.status(401).json({
-                success: false,
-                message: 'User already registered',
-            })
-        }
-
-        // generate otp
-        var otp = otpGenerator.generate(6, {
-            upperCaseAlphabets: false,
-            lowerCaseAlphabets: false,
-            specialChars: false,
-        });
-        console.log("OTP generated: ", otp);
-
-        // check unique otp or not
-        let result = await OTP.findOne({otp: otp});
-
-        while(result) {
-            otp = otpGenerator(6, {
-                upperCaseAlphabets: false,
-                lowerCaseAlphabets: false,
-                specialChars: false,
-            });
-            result = await OTP.findOne({otp: otp});
-        }
-
-        const otpPayload = {email, otp};
-
-        // create an entry for OTP
-        const otpBody = await OTP.create(otpPayload);
-        console.log(otpBody);
-
-        // return response successfully
-        res.status(200).json({
-            success: true,
-            message: 'OTP Sent Successfully',
-            otp,
+exports.sendotp = async (req, res) => {
+    try {
+      const { email } = req.body
+  
+      // Check if user is already present
+      // Find user with provided email
+      const checkUserPresent = await User.findOne({ email })
+      // to be used in case of signup
+  
+      // If user found with provided email
+      if (checkUserPresent) {
+        // Return 401 Unauthorized status code with error message
+        return res.status(401).json({
+          success: false,
+          message: `User is Already Registered`,
         })
-    }
-    catch(error) {
-        console.log(error);
-        return res.status(500).json({
-            success: false,
-            message: error.message,
+      }
+  
+      var otp = otpGenerator.generate(6, {
+        upperCaseAlphabets: false,
+        lowerCaseAlphabets: false,
+        specialChars: false,
+      })
+      const result = await OTP.findOne({ otp: otp })
+      console.log("Result is Generate OTP Func")
+      console.log("OTP", otp)
+      console.log("Result", result)
+      while (result) {
+        otp = otpGenerator.generate(6, {
+          upperCaseAlphabets: false,
         })
+      }
+      const otpPayload = { email, otp }
+      const otpBody = await OTP.create(otpPayload)
+      console.log("OTP Body", otpBody)
+      res.status(200).json({
+        success: true,
+        message: `OTP Sent Successfully`,
+        otp,
+      })
+    } catch (error) {
+      console.log(error.message)
+      return res.status(500).json({ success: false, error: error.message })
     }
 };
 
@@ -101,13 +91,13 @@ exports.signup = async (req, res) => {
         console.log(recentOTP);
 
         // validate OTP
-        if(recentOTP.length == 0){
+        if(recentOTP.length === 0){
             // OTP not found
             return res.status(400).json({
                 success: false,
                 message: 'OTP not found',
             })
-        } else if(otp !== recentOTP.otp) {
+        } else if(otp !== recentOTP[0].otp) {
             // Invalid otp
             return res.status(400).json({
                 success: false,
@@ -117,6 +107,10 @@ exports.signup = async (req, res) => {
 
         // hash password 
         const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create the user
+        let approved = ""
+        approved === "Instructor" ? (approved = false) : (approved = true)
 
         // entry create in Database
 
@@ -182,10 +176,10 @@ exports.login = async(req, res) => {
             const payload = {
                 email: user.email,
                 id: user._id,
-                accountType: user.accountType,
+                role: user.role,
             }
             const token = jwt.sign(payload, process.env.JWT_SECRET, {
-                expiresIn: "2h",
+                expiresIn: "24h",
             });
             user.token = token;
             user.password = undefined;
@@ -282,4 +276,4 @@ exports.changePassword = async (req, res) => {
         error: error.message,
       })
     }
-};
+  }

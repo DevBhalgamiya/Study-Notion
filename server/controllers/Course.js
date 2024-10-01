@@ -1,5 +1,5 @@
 const Course = require("../models/Course");
-const Tag = require("../models/Tag");
+const Category = require("../models/Category");
 const User = require("../models/User");
 const {uploadImageToCloudinary} = require("../utils/imageUploader");
 
@@ -7,22 +7,32 @@ const {uploadImageToCloudinary} = require("../utils/imageUploader");
 exports.createCourse = async (req, res) => {
     try{
         // get the data
-        const {courseName, courseDescription, whatYouWillLearn, price, tag} = req.body;
+        const {courseName, courseDescription, whatYouWillLearn, price, tag: _tag, category, status, instructions: _instructions,} = req.body;
 
         // get thumbnail
         const thumbnail = req.files.thumbnailImage;
 
+        // Convert the tag and instructions from stringified Array to Array
+        const tag = JSON.parse(_tag)
+        const instructions = JSON.parse(_instructions)
+
+        console.log("tag", tag)
+        console.log("instructions", instructions)
+
         // validation
-        if(!courseName || !courseDescription || !whatYouWillLearn || !price || !tag || !thumbnail) {
+        if(!courseName || !courseDescription || !whatYouWillLearn || !price || !tag.length || !thumbnail || !category || !instructions.length) {
             return res.status(400).json({
                 success: false,
                 message: 'All fields are required',
             });
         }
+        if (!status || status === undefined) {
+          status = "Draft"
+        }
 
         // check for Instructor
         const userId = req.user.id;
-        const instructorDetails = await User.findById(userId);
+        const instructorDetails = await User.findById(userId, {accountType: "Instructor"});
         console.log("InstructorDetails: ", instructorDetails);
 
         if(!instructorDetails) {
@@ -33,8 +43,8 @@ exports.createCourse = async (req, res) => {
         }
 
         // check given tag is valid or not
-        const tagDetails = await Tag.findById(tag);
-        if(!tagDetails) {
+        const CategoryDetails = await Category.findById(category);
+        if(!CategoryDetails) {
             return res.status(404).json({
                 success: false,
                 message: 'Tag Details not found',
@@ -51,8 +61,11 @@ exports.createCourse = async (req, res) => {
             instructor: instructorDetails._id,
             whatYouWillLearn: whatYouWillLearn,
             price,
-            tag: tagDetails._id,
+            tag,
+            category: CategoryDetails._id,
             thumbnail: thumbnailImage.secure_url,
+            status: status,
+            instructions,
         })
 
         // add the new course to the user schema of instructor
@@ -65,6 +78,18 @@ exports.createCourse = async (req, res) => {
             },
             {new:true},
         )
+
+        // Add the new course to the Categories
+        const categoryDetails2 = await Category.findByIdAndUpdate(
+          { _id: category },
+          {
+            $push: {
+              courses: newCourse._id,
+            },
+          },
+          { new: true }
+        )
+        console.log("HEREEEEEEEE", categoryDetails2)
 
         // return response
         return res.status(200).json({
@@ -83,13 +108,10 @@ exports.createCourse = async (req, res) => {
     }
 };
 
-
 // getAllCourses handler function
-
-exports.showAllCourses = async (req, res) => {
+exports.getAllCourses = async (req, res) => {
     try{
-        const allCourses = await Course.find({});
-        // const allCourses = await Course.find({}, {courseName: true, price: true, thumbnail: true, instructor: true, ratingAndReviews: true, studentEnrolled: true}).populate("instructor").exec();
+        const allCourses = await Course.find({status: "Published"}, {courseName: true, price: true, thumbnail: true, instructor: true, ratingAndReviews: true, studentEnrolled: true}).populate("instructor").exec();
 
         return res.status(200).json({
             success: true,
@@ -105,4 +127,37 @@ exports.showAllCourses = async (req, res) => {
             error: error.message,
         })
     }
-}
+};
+
+// getCourseDetails handler
+exports.getCourseDetails = async (req, res) => {
+  try {
+    // get id
+    const {courseId} = req.body;
+
+    // find course details
+    const courseDetails = await Course.find({_id: courseId}).populate({path: "instructor", populate: {path: "additionalDetials"}}).populate("category").populate("ratingAndreviews").populate({path: "courseContent", populate:{path: "subSection"}}).exec();
+
+    // validation
+    if(!courseDetails) {
+      return res.status(400).json({
+        success: false,
+        message: `Could not find the course with ${courseId}`,
+      });
+    }
+
+    // return response
+    return res.status(200).json({
+      success: true,
+      message: 'Course Detail fetched successfuly',
+      data: courseDetails,
+    });
+  } 
+  catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
