@@ -58,10 +58,11 @@ exports.showAllCategory = async (req, res) => {
 };
 
 
-//categoryPageDetails 
+//categoryPageDetails handler function
 
 exports.categoryPageDetails = async (req, res) => {
     try {
+      // get courseId
       const { categoryId } = req.body
       console.log("PRINTING CATEGORY ID: ", categoryId);
       // Get courses for the specified category
@@ -71,19 +72,19 @@ exports.categoryPageDetails = async (req, res) => {
           match: { status: "Published" },
           populate: "ratingAndReviews",
         })
-        .exec()
+        .exec();
   
       //console.log("SELECTED COURSE", selectedCategory)
       // Handle the case when the category is not found
       if (!selectedCategory) {
-        console.log("Category not found.")
-        return res
-          .status(404)
-          .json({ success: false, message: "Category not found" })
+        return res.status(404).json({ 
+          success: false, 
+          message: "Category not found",
+        })
       }
+
       // Handle the case when there are no courses
       if (selectedCategory.courses.length === 0) {
-        console.log("No courses found for the selected category.")
         return res.status(404).json({
           success: false,
           message: "No courses found for the selected category.",
@@ -97,8 +98,7 @@ exports.categoryPageDetails = async (req, res) => {
       let differentCategory = await Category.findOne(
         categoriesExceptSelected[getRandomInt(categoriesExceptSelected.length)]
           ._id
-      )
-        .populate({
+      ).populate({
           path: "courses",
           match: { status: "Published" },
         })
@@ -111,7 +111,7 @@ exports.categoryPageDetails = async (req, res) => {
           match: { status: "Published" },
           populate: {
             path: "instructor",
-        },
+          },
         })
         .exec()
       const allCourses = allCategories.flatMap((category) => category.courses)
@@ -134,4 +134,4 @@ exports.categoryPageDetails = async (req, res) => {
         error: error.message,
       })
     }
-}
+};

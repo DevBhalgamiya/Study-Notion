@@ -24,7 +24,7 @@ exports.resetPasswordToken = async (req, res) => {
         const token = crypto.randomBytes(20).toString("hex");
 
         // update user by adding token and expiration time
-        const updatedDetails =  await User.findByIdAndUpdate({email: email}, {
+        const updatedDetails =  await User.findOneAndUpdate({email: email}, {
             token: token,
             resetPasswordExpires: Date.now() + 3600000,
         }, {new: true}); 
@@ -57,10 +57,10 @@ exports.resetPasswordToken = async (req, res) => {
 exports.resetPassword = async (req, res) => {
     try{
         // get the data
-        const {password, confirmpassword, token} = req.body;
+        const {password, confirmPassword, token} = req.body;
 
         // validation
-        if (password !== confirmpassword) {
+        if (password !== confirmPassword) {
             return res.json({
                 success: false,
                 message: "Password and Confirm Password Does not Match",

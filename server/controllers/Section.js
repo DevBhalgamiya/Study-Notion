@@ -52,7 +52,6 @@ exports.createSection = async (req, res) => {
 };
 
 // updateSection handler
-
 exports.updateSection = async (req, res) => {
     try{
         // data fetch
