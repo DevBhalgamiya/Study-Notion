@@ -26,7 +26,7 @@ const CodeBlocks = ({position, heading, subheading, ctabtn1, ctabtn2, codeblock,
         </div>
         {/* Section 2 */}
         
-        <div className='h-fit border border-transparent bg-clip-border backdrop-blur-[52px] flex flex-row py-3 text-[10px] sm:text-sm leading-[18px] sm:leading-6 relative w-[100%] lg:w-[470px] bg-gradient-to-r from-[rgba(14,26,45,0.24)] to-[rgba(17,30,50,0.38)] rounded-lg shadow-lg'>
+        <div className='h-fit code-border flex flex-row py-3 text-[10px] sm:text-sm leading-[18px] sm:leading-6 relative w-[100%] lg:w-[470px]'>
             {backgroundGradient}
             <div className="text-center flex flex-col w-[10%] select-none text-richblack-400 font-inter font-bold">
                 <p>1</p>
