@@ -5,6 +5,7 @@ import HighlightText from '../components/core/HomePage/HighlightText';
 import CTAButton from '../components/core/HomePage/Button';
 import Banner from "../assets/Images/banner.mp4"
 import CodeBlocks from '../components/core/HomePage/CodeBlocks';
+import ExploreMore from '../components/core/HomePage/ExploreMore';
 import TimelineSection from '../components/core/HomePage/TimelineSection';
 import LearningLanguageSection from "../components/core/HomePage/LearningLanguageSection";
 import InstructorSection from "../components/core/HomePage/InstructorSection";
@@ -107,6 +108,8 @@ const Home = () => {
                     backgroundGradient={<div className="codeblock2 absolute"></div>}
                 />
             </div>
+
+            <ExploreMore />
         </div>
 
         {/* Section 2 */}
