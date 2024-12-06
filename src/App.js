@@ -9,6 +9,12 @@ import ForgotPassword from "./pages/ForgotPassword";
 import UpdatePassword from "./pages/UpdatePassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import About from "./pages/About";
+import Contact from "./pages/Contact";
+import Dashboard from "./pages/Dashboard";
+import PrivateRoute from "./components/core/Auth/PrivateRoute";
+import MyProfile from "./components/core/Dashboard/MyProfile";
+import Settings from "./components/core/Dashboard/Settings";
+import Error from "./pages/Error";
 
 function App() {
 
@@ -17,6 +23,7 @@ function App() {
     <Navbar/>
     <Routes>
       <Route path="/" element={<Home/>} />
+      {/* Open Route means any one access those who are login or not */}
       <Route
           path="signup"
           element={
@@ -63,9 +70,22 @@ function App() {
       />
 
       <Route path="/about" element={<About/>} />
+      <Route path="/contact" element={<Contact/>} />
+
+      {/* Private Route means access those who are login as it is Protected Route work*/}
+      <Route 
+        element={
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        }
+      >
+        <Route path="dashboard/my-profile" element={<MyProfile />} />
+        <Route path="dashboard/Settings" element={<Settings />} />
+      </Route>
+
+      <Route path="*" element={<Error />} />
     </Routes>
-
-
    </div>
   );
 }
