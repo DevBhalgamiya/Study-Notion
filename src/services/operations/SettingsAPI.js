@@ -8,7 +8,7 @@ const {
   UPDATE_DISPLAY_PICTURE_API,
   UPDATE_PROFILE_API,
   CHANGE_PASSWORD_API,
-  DELETE_PROFILE_API,
+  DELETE_PROFILE_API
 } = settingsEndpoints
 
 export function updateDisplayPicture(token, formData) {
@@ -68,6 +68,7 @@ export function updateProfile(token, formData) {
     toast.dismiss(toastId)
   }
 }
+
 
 export async function changePassword(token, formData) {
   const toastId = toast.loading("Loading...")
