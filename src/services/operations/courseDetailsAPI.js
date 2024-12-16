@@ -1,6 +1,6 @@
 import { toast } from "react-hot-toast"
-// import { updateCompletedLectures } from "../../slices/viewCourseSlice"
-// import { setLoading } from "../../slices/profileSlice";
+import { updateCompletedLectures } from "../../slices/viewCourseSlice"
+import { setLoading } from "../../slices/profileSlice";
 import { apiConnector } from "../apiconnector"
 import { courseEndpoints } from "../apis"
 
@@ -20,7 +20,7 @@ const {
   DELETE_COURSE_API,
   GET_FULL_COURSE_DETAILS_AUTHENTICATED,
   CREATE_RATING_API,
-  LECTURE_COMPLETION_API,
+  LECTURE_COMPLETION_API
 } = courseEndpoints
 
 export const getAllCourses = async () => {
@@ -289,6 +289,7 @@ export const fetchInstructorCourses = async (token) => {
 // delete a course
 export const deleteCourse = async (data, token) => {
   const toastId = toast.loading("Loading...")
+  console.log("delete course data", token);
   try {
     const response = await apiConnector("DELETE", DELETE_COURSE_API, data, {
       Authorization: `Bearer ${token}`,
