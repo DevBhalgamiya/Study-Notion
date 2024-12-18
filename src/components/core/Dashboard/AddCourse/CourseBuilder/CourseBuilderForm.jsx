@@ -31,8 +31,7 @@ export default function CourseBuilderForm() {
         },
         token 
       )
-    } 
-    else {
+    } else {
       result = await createSection(
         {
           sectionName: data.sectionName,
@@ -41,16 +40,15 @@ export default function CourseBuilderForm() {
         token
       )
     }
+
     if (result) {
       dispatch(setCourse(result));
       setEditSectionName(null);
       setValue("sectionName", "");
-    } else {
-      toast.error("Failed to create/update section");
     }
     setLoading(false);
   }
-
+  
   const cancelEdit = () => {
     setEditSectionName(null);
     setValue("sectionName", "");
