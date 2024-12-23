@@ -20,7 +20,9 @@ import Cart from "./components/core/Dashboard/Cart";
 import EnrolledCourses from "./components/core/Dashboard/EnrolledCourses";
 import MyCourses from "./components/core/Dashboard/MyCourses";
 import AddCourse from "./components/core/Dashboard/AddCourse";
+import EditCourse from "./components/core/Dashboard/EditCourse";
 // import Instructor from "./components/core/Dashboard/InstructorDashboard/Instructor";
+import Catalog from "./pages/Catalog";
 import Error from "./pages/Error";
 
 function App() {
@@ -32,6 +34,7 @@ function App() {
     <Navbar/>
     <Routes>
       <Route path="/" element={<Home/>} />
+      <Route path="catalog/:catalogName" element={<Catalog/>} />
       {/* Open Route means any one access those who are login or not */}
       <Route
           path="signup"
@@ -107,7 +110,7 @@ function App() {
               {/* <Route path="dashboard/instructor" element={<Instructor />} /> */}
               <Route path="dashboard/add-course" element={<AddCourse />} />
               <Route path="dashboard/my-courses" element={<MyCourses />} />
-              {/* <Route path="dashboard/edit-course/:courseId" element={<EditCourse />} /> */}
+              <Route path="dashboard/edit-course/:courseId" element={<EditCourse />} />
             </>
           )
         }
