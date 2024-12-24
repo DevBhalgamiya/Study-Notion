@@ -40,7 +40,7 @@ export const getAllCourses = async () => {
   return result
 }
 
-export const fetchCourseDetails = async (courseId) => {
+export const getCourseDetails = async (courseId) => {
   const toastId = toast.loading("Loading...")
   //   dispatch(setLoading(true));
   let result = null
