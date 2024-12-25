@@ -14,8 +14,8 @@ const CourseProgress = require("../models/CourseProgress")
 exports.capturePayment = async (req, res) => {
   const { courses } = req.body
   const userId = req.user.id
-  if (courses.length === 0) {
-    return res.json({ success: false, message: "Please Provide Course ID" })
+  if (!courses || courses.length === 0) {
+    return res.status(400).json({ success: false, message: "No courses selected" });
   }
 
   let total_amount = 0
