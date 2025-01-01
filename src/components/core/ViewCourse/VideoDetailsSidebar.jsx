@@ -3,39 +3,28 @@ import { BsChevronDown } from "react-icons/bs"
 import { IoIosArrowBack } from "react-icons/io"
 import { useSelector } from "react-redux"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
-
 import IconBtn from "../../common/IconBtn"
 
 export default function VideoDetailsSidebar({ setReviewModal }) {
-  const [activeStatus, setActiveStatus] = useState("")
-  const [videoBarActive, setVideoBarActive] = useState("")
-  const navigate = useNavigate()
-  const location = useLocation()
-  const { sectionId, subSectionId } = useParams()
-  const {
-    courseSectionData,
-    courseEntireData,
-    totalNoOfLectures,
-    completedLectures,
-  } = useSelector((state) => state.viewCourse)
+  const [activeStatus, setActiveStatus] = useState("");
+  const [videoBarActive, setVideoBarActive] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { sectionId, subSectionId } = useParams();
+  const { courseSectionData, courseEntireData, totalNoOfLectures, completedLectures} = useSelector((state) => state.viewCourse);
 
   useEffect(() => {
-    ;(() => {
-      if (!courseSectionData.length) return
+    const setActiveFlags = () => {
+      if (!courseSectionData.length) return;
       const currentSectionIndx = courseSectionData.findIndex(
         (data) => data._id === sectionId
       )
-      const currentSubSectionIndx = courseSectionData?.[
-        currentSectionIndx
-      ]?.subSection.findIndex((data) => data._id === subSectionId)
-      const activeSubSectionId =
-        courseSectionData[currentSectionIndx]?.subSection?.[
-          currentSubSectionIndx
-        ]?._id
+      const currentSubSectionIndx = courseSectionData?.[currentSectionIndx]?.subSection.findIndex((data) => data._id === subSectionId)
+      const activeSubSectionId = courseSectionData[currentSectionIndx]?.subSection?.[currentSubSectionIndx]?._id
       setActiveStatus(courseSectionData?.[currentSectionIndx]?._id)
       setVideoBarActive(activeSubSectionId)
-    })()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }
+    setActiveFlags();
   }, [courseSectionData, courseEntireData, location.pathname])
 
   return (
